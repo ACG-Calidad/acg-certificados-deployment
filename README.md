@@ -4,34 +4,42 @@ Sistema completo de gestión de certificados para ACG Calidad, integrado con Moo
 
 ## 📦 Componentes del Proyecto
 
-Este proyecto está compuesto por tres repositorios independientes:
+Este proyecto está compuesto por **4 repositorios independientes**:
 
-### 1. Frontend (Angular 21)
-**Repositorio:** [acg-certificados-frontend](https://github.com/ACG-Calidad/acg-certificados-frontend)
-- Aplicación web en Angular 21 + Angular Material
-- Interfaz responsiva para gestores y participantes
-- Autenticación SSO desde Moodle
-- Dashboard de estadísticas y reportes
+### 1. Plugin Moodle SSO
+**Repositorio:** [acg-certificados-plugin](https://github.com/ACG-Calidad/acg-certificados-plugin)
+- Plugin local de Moodle para Single Sign-On
+- Generación de tokens temporales (TTL 5 min)
+- Web Services para validación
+- Enlace automático en navegación (compatible con Boost Union)
+- Limpieza automática de tokens
 
-**Ubicación:** `./frontend/acg-certificados-frontend/`
+**Clonar en:** `./moodle-plugin/`
 
-### 2. Backend (PHP 8.4)
+### 2. Backend API (PHP 8.4)
 **Repositorio:** [acg-certificados-backend](https://github.com/ACG-Calidad/acg-certificados-backend)
 - API REST en PHP 8.4
 - Generación de PDFs con FPDF + FPDI
 - Integración con Moodle Web Services
 - Integración con Google Apps Script para emails
 
-**Ubicación:** `./backend/`
+**Clonar en:** `./backend/`
 
-### 3. Plugin Moodle SSO
-**Repositorio:** [moodle-local_certificados_sso](https://github.com/ACG-Calidad/moodle-local_certificados_sso)
-- Plugin local de Moodle para Single Sign-On
-- Generación de tokens temporales
-- Web Services para validación
-- Enlace automático en navegación de Moodle
+### 3. Frontend (Angular 21)
+**Repositorio:** [acg-certificados-frontend](https://github.com/ACG-Calidad/acg-certificados-frontend)
+- Aplicación web en Angular 21 + Angular Material
+- Interfaz responsiva para gestores y participantes
+- Autenticación SSO desde Moodle
+- Dashboard de estadísticas y reportes
 
-**Ubicación:** `./moodle-plugin/`
+**Clonar en:** `./frontend/acg-certificados-frontend/`
+
+### 4. Deployment (Este repositorio)
+**Repositorio:** [acg-certificados-deployment](https://github.com/ACG-Calidad/acg-certificados-deployment)
+- Configuración de Docker Compose
+- Scripts de utilidad (clone-green-to-local, reset-database)
+- Documentación completa
+- Manuales de configuración
 
 ---
 
@@ -48,26 +56,38 @@ Este proyecto está compuesto por tres repositorios independientes:
 
 ### Instalación Local con Docker
 
-#### 1. Clonar el repositorio principal
+#### 1. Clonar repositorio de deployment
 ```bash
-git clone https://github.com/ACG-Calidad/moodle-local_certificados_sso.git acg-gestor-certificados
-cd acg-gestor-certificados
+git clone https://github.com/ACG-Calidad/acg-certificados-deployment.git
+cd acg-certificados-deployment
 ```
 
-#### 2. Iniciar servicios Docker
+#### 2. Clonar los 3 sub-repositorios
+```bash
+# Plugin Moodle
+git clone https://github.com/ACG-Calidad/acg-certificados-plugin.git moodle-plugin
+
+# Backend
+git clone https://github.com/ACG-Calidad/acg-certificados-backend.git backend
+
+# Frontend
+git clone https://github.com/ACG-Calidad/acg-certificados-frontend.git frontend/acg-certificados-frontend
+```
+
+#### 3. Iniciar servicios Docker
 ```bash
 docker-compose up -d
 ```
 
 Esto levanta:
 - **Moodle:** http://localhost:8082
-- **Backend API:** http://localhost:8080
+- **Backend API:** http://localhost:8080 (cuando esté desarrollado)
 - **phpMyAdmin:** http://localhost:8081
-- **Frontend:** http://localhost:4200
+- **Frontend:** http://localhost:4200 (cuando esté desarrollado)
 
-#### 3. Configurar Moodle
+#### 4. Configurar Moodle
 
-Seguir el manual de configuración:
+Seguir los manuales de configuración:
 - [SETUP-LOCAL-MOODLE.md](./docs/SETUP-LOCAL-MOODLE.md) - Setup completo del ambiente local
 - [MANUAL-CONFIGURACION-PLUGIN.md](./docs/MANUAL-CONFIGURACION-PLUGIN.md) - Configuración del plugin SSO
 
