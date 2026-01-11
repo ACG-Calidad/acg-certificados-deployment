@@ -1,0 +1,31 @@
+# Sub-repositorios (manejados independientemente)
+moodle-plugin/
+backend/
+frontend/
+
+# Moodle data directories
+moodle-data/
+moodle-files/
+
+# Docker logs
+docker/logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backups
+*.sql
+*.sql.gz
+backups/
+
+# Temporary files
+*.tmp
+*.log

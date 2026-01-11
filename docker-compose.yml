@@ -1,0 +1,118 @@
+services:
+  # ============================================================
+  # PHP 8.4 + Apache 2.4
+  # ============================================================
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: acg-certificados-php
+    ports:
+      - "8080:80" # API accesible en http://localhost:8080
+    volumes:
+      # Montar código del backend
+      - ./backend:/var/www/html:cached
+      # Configuración PHP personalizada
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+      # Logs de Apache
+      - ./docker/logs/apache:/var/log/apache2
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+      - PHP_DISPLAY_ERRORS=On
+      - PHP_ERROR_REPORTING=E_ALL
+    networks:
+      - acg-network
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+  # ============================================================
+  # Moodle 5.1 (Clone de Green)
+  # ============================================================
+  moodle:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: acg-moodle-local
+    ports:
+      - "8082:80" # Moodle accesible en http://localhost:8082
+    volumes:
+      - ./moodle-files:/var/www/html:cached
+      - ./moodle-data:/var/www/moodledata:cached
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+      - ./docker/logs/moodle:/var/log/apache2
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+      - PHP_DISPLAY_ERRORS=On
+      - PHP_ERROR_REPORTING=E_ALL
+    networks:
+      - acg-network
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+  # ============================================================
+  # MariaDB 10.11
+  # ============================================================
+  mariadb:
+    image: mariadb:10.11.15
+    container_name: acg-certificados-db
+    ports:
+      - "3307:3306" # Puerto 3307 para evitar conflictos con MySQL local
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_dev
+      MYSQL_DATABASE: moodle51_dev
+      MYSQL_USER: certificates_app
+      MYSQL_PASSWORD: dev_password
+      TZ: America/Bogota
+    volumes:
+      # Persistencia de datos
+      - mariadb-data:/var/lib/mysql
+      # Script de inicialización
+      - ./docker/mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      # Configuración MariaDB
+      - ./docker/mariadb/mariadb.cnf:/etc/mysql/conf.d/custom.cnf:ro
+    networks:
+      - acg-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================
+  # phpMyAdmin (opcional, para administración visual)
+  # ============================================================
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: acg-certificados-phpmyadmin
+    ports:
+      - "8081:80" # phpMyAdmin accesible en http://localhost:8081
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root_password_dev
+      UPLOAD_LIMIT: 100M
+    networks:
+      - acg-network
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+# ============================================================
+# Volúmenes
+# ============================================================
+volumes:
+  mariadb-data:
+    driver: local
+    name: acg-certificados-mariadb-data
+
+# ============================================================
+# Redes
+# ============================================================
+networks:
+  acg-network:
+    driver: bridge
+    name: acg-certificados-network

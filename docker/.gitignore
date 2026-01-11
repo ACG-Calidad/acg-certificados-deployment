@@ -1,0 +1,6 @@
+# Logs de Apache
+logs/
+
+# Archivos temporales
+*.log
+*.tmp

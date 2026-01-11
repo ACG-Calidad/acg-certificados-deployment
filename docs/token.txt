@@ -1,0 +1,1 @@
+certificados_sso local: bd327edf1c4e86ee7276600be6190ae2
