@@ -64,7 +64,7 @@ acg-certificados-phpmyadmin Up        0.0.0.0:8081->80/tcp
 **O usar el usuario de la aplicación:**
 - **Usuario:** `certificates_app`
 - **Contraseña:** `dev_password`
-- **Base de datos:** `moodle51_dev`
+- **Base de datos:** `moodle_dev`
 
 ### Base de Datos (Conexión Externa)
 ```bash
@@ -77,7 +77,7 @@ Host: 127.0.0.1
 Port: 3307
 User: certificates_app
 Password: dev_password
-Database: moodle51_dev
+Database: moodle_dev
 ```
 
 ---
@@ -182,20 +182,20 @@ docker-compose exec php php /var/www/html/scripts/migrate_database.php
 docker cp backup.sql acg-certificados-db:/tmp/
 
 # Importar
-docker-compose exec mariadb mysql -u root -proot_password_dev moodle51_dev < /tmp/backup.sql
+docker-compose exec mariadb mysql -u root -proot_password_dev moodle_dev < /tmp/backup.sql
 
 # O directamente:
-docker-compose exec -T mariadb mysql -u root -proot_password_dev moodle51_dev < backup.sql
+docker-compose exec -T mariadb mysql -u root -proot_password_dev moodle_dev < backup.sql
 ```
 
 ### Exportar Base de Datos
 
 ```bash
 # Crear dump
-docker-compose exec mariadb mysqldump -u root -proot_password_dev moodle51_dev > dump_$(date +%Y%m%d).sql
+docker-compose exec mariadb mysqldump -u root -proot_password_dev moodle_dev > dump_$(date +%Y%m%d).sql
 
 # Solo tablas cc_*
-docker-compose exec mariadb mysqldump -u root -proot_password_dev moodle51_dev cc_certificados cc_certificados_plantillas cc_certificados_log > dump_cc_tables.sql
+docker-compose exec mariadb mysqldump -u root -proot_password_dev moodle_dev cc_certificados cc_certificados_plantillas cc_certificados_log > dump_cc_tables.sql
 ```
 
 ### Resetear Base de Datos
@@ -292,7 +292,7 @@ docker-compose exec mariadb healthcheck.sh --connect
 docker-compose logs mariadb
 
 # Probar conexión manual
-docker-compose exec php php -r "new PDO('mysql:host=mariadb;dbname=moodle51_dev', 'certificates_app', 'dev_password');"
+docker-compose exec php php -r "new PDO('mysql:host=mariadb;dbname=moodle_dev', 'certificates_app', 'dev_password');"
 ```
 
 ### Permisos en storage/

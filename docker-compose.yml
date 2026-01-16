@@ -37,7 +37,7 @@ services:
       - "3307:3306" # Puerto 3307 para evitar conflictos con MySQL local
     environment:
       MYSQL_ROOT_PASSWORD: root_password_dev
-      MYSQL_DATABASE: moodle51_dev
+      MYSQL_DATABASE: moodle_dev
       MYSQL_USER: certificates_app
       MYSQL_PASSWORD: dev_password
       TZ: America/Bogota

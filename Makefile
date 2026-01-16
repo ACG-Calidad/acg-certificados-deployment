@@ -45,7 +45,7 @@ shell: ## Acceder a shell de PHP
 	docker-compose exec php bash
 
 db-shell: ## Acceder a shell de MariaDB
-	docker-compose exec mariadb mysql -u certificates_app -pdev_password moodle51_dev
+	docker-compose exec mariadb mysql -u certificates_app -pdev_password moodle_dev
 
 install: up ## Instalar dependencias
 	docker-compose exec php composer install
@@ -84,9 +84,9 @@ composer: ## Ejecutar comando de Composer (uso: make composer cmd="require vendo
 # Backup y restore
 backup: ## Crear backup de BD
 	@mkdir -p backups
-	docker-compose exec mariadb mysqldump -u root -proot_password_dev moodle51_dev > backups/backup_$$(date +%Y%m%d_%H%M%S).sql
+	docker-compose exec mariadb mysqldump -u root -proot_password_dev moodle_dev > backups/backup_$$(date +%Y%m%d_%H%M%S).sql
 	@echo '${GREEN}✓ Backup creado en backups/${RESET}'
 
 restore: ## Restaurar backup (uso: make restore file=backup.sql)
-	@docker-compose exec -T mariadb mysql -u root -proot_password_dev moodle51_dev < $(file)
+	@docker-compose exec -T mariadb mysql -u root -proot_password_dev moodle_dev < $(file)
 	@echo '${GREEN}✓ Backup restaurado${RESET}'
