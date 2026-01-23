@@ -29,3 +29,6 @@ backups/
 # Temporary files
 *.tmp
 *.log
+
+# Assets no versionables
+plantillas

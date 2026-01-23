@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     vim \
+    nano \
     # Librerías para extensiones PHP
     libpng-dev \
     libjpeg-dev \
@@ -20,6 +21,9 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libicu-dev \
+    # Imagick y GhostScript para conversión PDF a PNG
+    libmagickwand-dev \
+    ghostscript \
     # MariaDB client
     default-mysql-client \
     # Limpiar caché
@@ -44,12 +48,28 @@ RUN docker-php-ext-install \
     opcache \
     soap
 
+# Instalar Imagick via PECL
+RUN pecl install imagick \
+    && docker-php-ext-enable imagick
+
+# Configurar ImageMagick para permitir lectura de PDFs
+RUN sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml || true
+
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Configurar Apache
 # Habilitar mod_rewrite para URLs amigables
 RUN a2enmod rewrite headers expires
+
+# Habilitar configuración de certificados (el archivo se monta via docker-compose)
+# Creamos un script de inicio que habilita la conf si existe
+RUN echo '#!/bin/bash\n\
+if [ -f /etc/apache2/conf-available/certificados.conf ]; then\n\
+    a2enconf certificados\n\
+fi\n\
+exec apache2-foreground' > /usr/local/bin/start-apache.sh \
+    && chmod +x /usr/local/bin/start-apache.sh
 
 # Configurar DocumentRoot
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
@@ -91,4 +111,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
     CMD curl -f http://localhost/ || exit 1
 
 # Comando por defecto (Apache debe ejecutarse como root para bind al puerto 80)
-CMD ["apache2-foreground"]
+# Usa el script que habilita certificados.conf si existe
+CMD ["/usr/local/bin/start-apache.sh"]
