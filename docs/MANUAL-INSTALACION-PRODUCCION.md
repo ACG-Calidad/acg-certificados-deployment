@@ -243,11 +243,12 @@ cc_descargas_log
 cc_generaciones_log
 cc_notificaciones_log
 cc_plantillas
+cc_plantillas_campos
 cc_validaciones_log
 ```
 
 **Verificación:**
-- ✅ 8 tablas creadas (incluyendo legacy)
+- ✅ 9 tablas creadas (incluyendo legacy y plantillas_campos)
 - ✅ Sin errores de Foreign Keys
 
 **Estado:** ⏳ Pendiente
@@ -882,6 +883,99 @@ Antes de declarar la instalación como exitosa, verificar:
 - [ ] Queries de listado retornan datos correctos
 
 **Estado General:** ⏳ Pendiente
+
+---
+
+### Fase 11: Copiar Plantillas PDF y Datos
+
+#### 11.1 Copiar Datos de Plantillas desde BD Local
+
+Las tablas `cc_plantillas` y `cc_plantillas_campos` se crean automáticamente por el TemplateService, pero necesitan datos iniciales.
+
+```bash
+# Desde máquina local, exportar datos de plantillas
+docker exec acg-certificados-db mysqldump -ucertificates_app -pdev_password moodle_dev \
+  cc_plantillas cc_plantillas_campos --no-create-info > /tmp/plantillas_data.sql
+
+# Importar en Green (vía RDS)
+mysql -h acgdb.c2uujyoezwbf.us-east-1.rds.amazonaws.com -uroot -p'cl4v3dbr00t!' moodle51 \
+  < /tmp/plantillas_data.sql
+```
+
+**Estado:** ⏳ Pendiente
+
+---
+
+#### 11.2 Copiar Archivos PDF de Plantillas
+
+```bash
+# Extraer archivos del contenedor Moodle local
+docker cp acg-moodle-local:/var/www/html/certificados/storage/templates/base/. /tmp/templates-base/
+docker cp acg-moodle-local:/var/www/html/certificados/storage/templates/cursos/. /tmp/templates-cursos/
+
+# Subir a Green
+scp -r /tmp/templates-base/* ec2-user@${GREEN_IP}:/tmp/
+scp -r /tmp/templates-cursos/* ec2-user@${GREEN_IP}:/tmp/
+
+# En Green, mover a ubicación final
+ssh ec2-user@${GREEN_IP} 'sudo mkdir -p /var/www/html/certificados/storage/templates/base /var/www/html/certificados/storage/templates/cursos && sudo mv /tmp/certificado-base*.* /var/www/html/certificados/storage/templates/base/ && sudo mv /tmp/curso-*.* /var/www/html/certificados/storage/templates/cursos/ && sudo chown -R ec2-user:apache /var/www/html/certificados/storage/templates/'
+```
+
+**Archivos esperados:**
+- `storage/templates/base/certificado-base.pdf`
+- `storage/templates/base/certificado-base-preview.png`
+- `storage/templates/cursos/curso-29-contenidos.pdf`
+- `storage/templates/cursos/curso-29-contenidos-preview.png`
+
+**Estado:** ⏳ Pendiente
+
+---
+
+### Fase 12: Configuración SSL para Go-Live
+
+#### 12.1 Arquitectura de VirtualHosts
+
+Green tiene la siguiente configuración de Apache:
+
+| Archivo | ServerName | Puerto | DocumentRoot | Notas |
+|---------|------------|--------|--------------|-------|
+| `sites-enabled/aulavirtual.acgcalidad.co.conf` | aulavirtual.acgcalidad.co | 80 | `/var/www/html/aulavirtual/public` | Moodle HTTP |
+| `sites-enabled/aulavirtual.acgcalidad.co-ssl.conf` | aulavirtual.acgcalidad.co | 443 | `/var/www/html/aulavirtual/public` | Moodle HTTPS + Alias /certificados |
+| `conf.d/00-default-ip.conf` | IP directa | 80/443 | `/var/www/html/public` | WordPress + Alias /aulavirtual |
+
+**Importante:** El Alias `/certificados` solo está configurado en el VirtualHost SSL.
+
+#### 12.2 Reemplazar Certificado SSL Temporal
+
+Actualmente Green usa un certificado auto-firmado. Para Go-Live:
+
+```bash
+# 1. Obtener certificado SSL real (ej: Let's Encrypt o GoDaddy)
+# 2. Reemplazar archivos en Green:
+sudo cp /path/to/real-cert.crt /etc/pki/tls/certs/aulavirtual.acgcalidad.co.crt
+sudo cp /path/to/real-key.key /etc/pki/tls/private/aulavirtual.acgcalidad.co.key
+
+# 3. Actualizar VirtualHost SSL
+sudo nano /etc/httpd/sites-available/aulavirtual.acgcalidad.co-ssl.conf
+
+# Cambiar:
+#   SSLCertificateFile /etc/pki/tls/certs/localhost.crt
+#   SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
+# Por:
+#   SSLCertificateFile /etc/pki/tls/certs/aulavirtual.acgcalidad.co.crt
+#   SSLCertificateKeyFile /etc/pki/tls/private/aulavirtual.acgcalidad.co.key
+
+# 4. Reiniciar Apache
+sudo systemctl restart httpd
+```
+
+#### 12.3 Cambio de DNS (Go-Live)
+
+Al momento de Go-Live, en GoDaddy cambiar el registro A de `aulavirtual.acgcalidad.co` para apuntar a la IP de Green.
+
+**No se requiere recompilar la aplicación** - todas las URLs ya están configuradas para usar `https://aulavirtual.acgcalidad.co`.
+
+**Estado:** ⏳ Pendiente
 
 ---
 

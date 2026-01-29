@@ -186,24 +186,82 @@ En el repositorio de actualización:
 
 ## 📊 Estado del Proyecto
 
-**Fase actual:** Desarrollo - Configuración Completa
+**Fase actual:** Listo para Despliegue en Producción (Green)
+**Última validación local:** 2026-01-27 ✅
 
-### ✅ Completado
+### ✅ Desarrollo Completado
+
 - [x] Ambiente Docker local funcional
 - [x] Moodle 5.1 clonado y configurado
-- [x] Plugin SSO instalado y configurado
+- [x] Plugin SSO instalado y configurado (local)
 - [x] Web Services habilitados
 - [x] Enlace "Mis Certificados" funcional
-- [x] Documentación completa
+- [x] Backend API completo (19 endpoints)
+- [x] Frontend Angular 21 completo
+- [x] Generación de PDFs con FPDF + FPDI
+- [x] Integración con Google Apps Script para notificaciones
+- [x] Scripts de migración de datos
+- [x] Documentación de despliegue
+- [x] Validación completa en entorno local
 
-### 🔄 En Progreso
-- [ ] Backend API (próxima sesión)
-- [ ] Frontend Angular
-- [ ] Integración completa
+### 🚀 Pendiente para Go-Live
+
+1. [ ] **Instalar en Green** - Plugin Moodle + Backend + Frontend
+2. [ ] **Validación con cliente** - Pruebas de flujos completos
+3. [ ] **Ajustes según feedback** - Si el cliente lo requiere
+4. [ ] **Sincronizar datos** - Ejecutar sync-blue-to-green.sh antes del switch
+
+Ver guía completa: [DEPLOY-GREEN.md](./docs/DEPLOY-GREEN.md)
+
+---
+
+## 🚀 Despliegue en Producción
+
+### URLs de Producción
+
+| Componente     | URL                                                  |
+| -------------- | ---------------------------------------------------- |
+| **Frontend**   | `https://aulavirtual.acgcalidad.co/certificados/`    |
+| **Backend API**| `https://aulavirtual.acgcalidad.co/certificados/api/`|
+| **Moodle**     | `https://aulavirtual.acgcalidad.co/`                 |
+
+### Documentación de Despliegue
+
+- [DEPLOY-GREEN.md](./docs/DEPLOY-GREEN.md) - Guía completa de despliegue en Green
+- [MANUAL-INSTALACION-PRODUCCION.md](./docs/MANUAL-INSTALACION-PRODUCCION.md) - Manual detallado de instalación
+
+### Pasos Rápidos
+
+```bash
+# 1. Compilar y empaquetar
+./scripts/build-production.sh
+
+# 2. (Pre-GoLive) Sincronizar datos Blue → Green
+./scripts/sync-blue-to-green.sh
+
+# 3. Subir a Green
+GREEN_IP=$(aws ec2 describe-instances --instance-ids i-000dcbbd4f40af84c \
+    --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+scp -i ~/.ssh/ClaveACG.pem /tmp/certificados-deploy-*.zip ec2-user@$GREEN_IP:/tmp/
+
+# 4. Seguir instrucciones en DEPLOY-GREEN.md
+```
 
 ---
 
 ## 🛠️ Scripts Útiles
+
+### Build de Producción
+Compila frontend, prepara backend y crea paquete ZIP:
+```bash
+./scripts/build-production.sh
+```
+
+### Sincronización Pre-GoLive
+Sincroniza datos de certificados de Blue a Green:
+```bash
+./scripts/sync-blue-to-green.sh
+```
 
 ### Clone Green to Local
 Clona el ambiente de producción (Green en AWS) al ambiente local:
@@ -268,4 +326,4 @@ Proyecto privado - ACG Calidad © 2026
 
 ---
 
-*Última actualización: 2026-01-10*
+*Última actualización: 2026-01-27*

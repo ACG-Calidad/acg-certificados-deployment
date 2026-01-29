@@ -32,3 +32,6 @@ backups/
 
 # Assets no versionables
 plantillas
+
+# Tokens
+docs/tokens.json
