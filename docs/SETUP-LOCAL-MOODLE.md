@@ -19,7 +19,7 @@ Este documento describe cómo clonar el ambiente Moodle 5.1 de Green a tu máqui
 
 - ✅ Docker Desktop instalado y funcionando
 - ✅ Al menos 10GB de espacio libre en disco
-- ✅ Acceso SSH a Green (3.94.80.17)
+- ✅ Acceso SSH a Green (52.7.23.191)
 - ✅ Clave SSH (`ClaveACG.pem`)
 - ✅ Terminal con bash
 
@@ -31,7 +31,7 @@ Este documento describe cómo clonar el ambiente Moodle 5.1 de Green a tu máqui
 
 ```bash
 # Conectar a Green
-ssh -i ~/.ssh/ClaveACG.pem ec2-user@3.94.80.17
+ssh -i ~/.ssh/ClaveACG.pem ec2-user@52.7.23.191
 ```
 
 ### 1.2 Crear backup de la base de datos
@@ -110,12 +110,12 @@ mkdir -p backups
 
 # Descargar backup de BD
 scp -i ~/.ssh/ClaveACG.pem \
-  ec2-user@3.94.80.17:~/moodle51_backup_*.sql.gz \
+  ec2-user@52.7.23.191:~/moodle51_backup_*.sql.gz \
   ./backups/
 
 # Descargar backup de moodledata
 scp -i ~/.ssh/ClaveACG.pem \
-  ec2-user@3.94.80.17:~/moodledata_backup_*.tar.gz \
+  ec2-user@52.7.23.191:~/moodledata_backup_*.tar.gz \
   ./backups/
 ```
 
@@ -129,7 +129,7 @@ rsync -avz --progress \
   -e "ssh -i ~/.ssh/ClaveACG.pem" \
   --exclude='cache' \
   --exclude='.git' \
-  ec2-user@3.94.80.17:/var/www/html/aulavirtual/ \
+  ec2-user@52.7.23.191:/var/www/html/aulavirtual/ \
   ./moodle-files/
 ```
 

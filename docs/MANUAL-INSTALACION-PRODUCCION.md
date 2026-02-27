@@ -66,18 +66,8 @@ Existe una **única instancia RDS** compartida entre Blue y Green con dos bases 
 #### 1.1 Acceso SSH al Servidor Green
 
 ```bash
-# Obtener IP pública actual de Green
-export AWS_PROFILE=acg
-aws ec2 describe-instances \
-    --instance-ids i-000dcbbd4f40af84c \
-    --query 'Reservations[0].Instances[0].PublicIpAddress' \
-    --output text
-
-# Guardar en variable
-GREEN_IP=$(aws ec2 describe-instances \
-    --instance-ids i-000dcbbd4f40af84c \
-    --query 'Reservations[0].Instances[0].PublicIpAddress' \
-    --output text)
+# IP Elástica de Green — fija, no cambia nunca
+GREEN_IP="52.7.23.191"
 
 # Conectar vía SSH
 ssh -i ~/.ssh/ClaveACG.pem ec2-user@${GREEN_IP}

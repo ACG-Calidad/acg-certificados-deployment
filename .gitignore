@@ -35,3 +35,6 @@ plantillas
 
 # Tokens
 docs/tokens.json
+
+# OMC
+.omc/

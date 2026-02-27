@@ -239,9 +239,8 @@ Ver guía completa: [DEPLOY-GREEN.md](./docs/DEPLOY-GREEN.md)
 # 2. (Pre-GoLive) Sincronizar datos Blue → Green
 ./scripts/sync-blue-to-green.sh
 
-# 3. Subir a Green
-GREEN_IP=$(aws ec2 describe-instances --instance-ids i-000dcbbd4f40af84c \
-    --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+# 3. Subir a Green (IP Elástica fija, no cambia)
+GREEN_IP="52.7.23.191"
 scp -i ~/.ssh/ClaveACG.pem /tmp/certificados-deploy-*.zip ec2-user@$GREEN_IP:/tmp/
 
 # 4. Seguir instrucciones en DEPLOY-GREEN.md

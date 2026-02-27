@@ -15,7 +15,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Variables
-GREEN_IP="3.94.80.17"
+GREEN_IP="52.7.23.191"  # IP Elástica fija — no cambiar
 SSH_KEY="$HOME/.ssh/ClaveACG.pem"
 PROJECT_DIR="/Users/ocastelblanco/Documents/ACG/Actualizacion2026/acg-gestor-certificados"
 BACKUP_DIR="$PROJECT_DIR/backups"
