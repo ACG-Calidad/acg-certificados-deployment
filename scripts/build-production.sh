@@ -103,12 +103,12 @@ build_frontend() {
     ng build --configuration=production --base-href=/certificados/
 
     # Verificar que se creó
-    if [ ! -d "dist/acg-certificados-frontend/browser" ]; then
+    if [ ! -d "dist/acg-certificados/browser" ]; then
         echo -e "${RED}Error: No se generó el build del frontend${NC}"
         exit 1
     fi
 
-    FRONTEND_SIZE=$(du -sh dist/acg-certificados-frontend/browser | awk '{print $1}')
+    FRONTEND_SIZE=$(du -sh dist/acg-certificados/browser | awk '{print $1}')
     echo -e "${GREEN}  ✓ Frontend compilado ($FRONTEND_SIZE)${NC}"
     echo ""
 }
@@ -148,7 +148,7 @@ create_deploy_structure() {
 
     # ----- Frontend -----
     echo "  Copiando frontend..."
-    cp -r "$FRONTEND_DIR/dist/acg-certificados-frontend/browser/"* "$DEPLOY_DIR/"
+    cp -r "$FRONTEND_DIR/dist/acg-certificados/browser/"* "$DEPLOY_DIR/"
 
     # ----- Backend (API) -----
     echo "  Copiando backend..."
@@ -175,7 +175,7 @@ create_deploy_structure() {
 # CORS Headers
 <IfModule mod_headers.c>
     Header always set Access-Control-Allow-Origin "https://aulavirtual.acgcalidad.co"
-    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
     Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
     Header always set Access-Control-Allow-Credentials "true"
 </IfModule>
