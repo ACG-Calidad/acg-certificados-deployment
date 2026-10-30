@@ -58,7 +58,7 @@ gzip moodle51_backup_$(date +%Y%m%d).sql
 ls -lh moodle51_backup_*.sql.gz
 ```
 
-> La contraseña de `moodle` es: `m00dl3!`
+> La contraseña de `moodle` es: `[ver claves-acg.txt]`
 
 **Resultado esperado:**
 ```

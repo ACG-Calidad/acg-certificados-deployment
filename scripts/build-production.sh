@@ -182,6 +182,11 @@ create_deploy_structure() {
 HTACCESS
 
     # ----- Directorios del backend -----
+    # config.production.php tiene credenciales y no está en git: debe existir localmente
+    if [ ! -f "$BACKEND_DIR/config/config.production.php" ]; then
+        echo -e "${RED}Error: falta $BACKEND_DIR/config/config.production.php (no versionado; créalo desde config.example.php con las claves de producción)${NC}"
+        exit 1
+    fi
     echo "  Copiando configuración y librerías..."
     cp -r "$BACKEND_DIR/config" "$DEPLOY_DIR/"
     cp -r "$BACKEND_DIR/lib" "$DEPLOY_DIR/"
