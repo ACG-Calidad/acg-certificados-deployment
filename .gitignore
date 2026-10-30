@@ -38,3 +38,5 @@ docs/tokens.json
 
 # OMC
 .omc/
+# Contiene credenciales de producción: solo local
+scripts/clone-green-to-local.sh
